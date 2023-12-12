@@ -49,6 +49,9 @@ internal fun Project.configureKotlinAndroid() {
 }
 
 internal fun Project.configureKotlinJvm() {
+    // Plugins
+    pluginManager.apply("org.jetbrains.kotlin.jvm")
+
     extensions.configure<JavaPluginExtension> {
         // Up to Java 11 APIs are available through desugaring
         // https://developer.android.com/studio/write/java11-minimal-support-table
