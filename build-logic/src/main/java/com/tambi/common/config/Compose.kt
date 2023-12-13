@@ -13,11 +13,13 @@ import java.io.File
 
 internal fun Project.configureComposeAndroid() {
     androidExtension.apply {
-        buildFeatures.compose = true
+        buildFeatures {
+            compose = true
+        }
 
         composeOptions {
             kotlinCompilerExtensionVersion =
-                versionCatalog.findVersion("androidxComposeCompiler").get().toString()
+                versionCatalog.findVersion("composeCompiler").get().toString()
         }
 
         tasks.withType<KotlinCompile>().configureEach {

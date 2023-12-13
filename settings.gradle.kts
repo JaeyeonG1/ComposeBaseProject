@@ -16,5 +16,15 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ComposeProject"
+
 include(":app")
- 
+
+include(
+    ":core:design-system",
+    ":core:navigation",
+    ":core:domain",
+    ":core:data",
+    ":core:model",
+)
+
+include(":feature:main")
