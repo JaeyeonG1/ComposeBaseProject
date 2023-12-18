@@ -1,0 +1,519 @@
+build: # Detekt 빌드 프로세스에 대한 설정.
+    maxIssues: 0                # 빌드 성공 처리에 필요한 최대 issue 개수 설정. default = 0
+    excludeCorrectable: false   # Detekt가 autocorrect 처리 할 수 있는 문제를 개수에서 제외
+    weights: # maxIssues 계산 시의 임계값 설정. e.g. style 관련 문제가 2개이고, weight = 2이면 4로 판정됨.
+        style: 0    # style 검사는 Ktlint에서 수행하므로 count 하지 않음.
+        comments: 0 # 주석 관련 규칙은 count 하지 않고 경고만 생성.
+
+config: # detekt 실행 시 사용 할 설정을 지정.
+    validation: true            # 룰 정의 및 설정 파일 유효성 검사.
+    warningsAsErrors: true      # 경고를 에러로 취급하여 빌드 실패 처리.
+    checkExhaustiveness: true   # when 케이스 누락 검사.
+    excludes: ''                # 특정 보고서, 규칙 제외 처리. 'my_rule_set,.*>.*>[my_property]' 형태로 규칙 경로 지정.
+
+processors: # Detekt 실행 시 작업 할 processor 활성화/비활성화 및 제외 사항 설정.
+    active: true # processors 전역 활성화 여부. default = true
+    exclude: # 제외할 processor 선언
+        - 'DetektProgressListener'                  # Detekt 실행 중 progress에 대한 indicator 활성화.
+        # - 'KtFileCountProcessor'                  # Kotlin 파일 수를 계산합니다
+        # - 'PackageCountProcessor'                 # 패키지 수를 계산합니다.
+        # - 'ClassCountProcessor'                   # 클래스 수를 계산합니다
+        # - 'FunctionCountProcessor'                # 함수 수를 계산합니다.
+        # - 'PropertyCountProcessor'                # 프로퍼티 수를 계산합니다.
+        # - 'ProjectComplexityProcessor'            # 프로젝트 전체 코드 복잡성을 계산합니다.
+        # - 'ProjectCognitiveComplexityProcessor'   # 프로젝트 전체 인지적 복잡성을 계산합니다.
+        # - 'ProjectLLOCProcessor'                  # 프로젝트 전체 논리적 코드 줄 수를 계산합니다.
+        # - 'ProjectCLOCProcessor'                  # 프로젝트 전체 코드 줄 수를 계산합니다.
+        # - 'ProjectLOCProcessor'                   # 프로젝트 전체 코드 줄 수 (빈 줄 포함)를 계산합니다.
+        # - 'ProjectSLOCProcessor'                  # 프로젝트 전체 소스 코드 줄 수를 계산합니다.
+        # - 'LicenseHeaderLoaderExtension'          # 라이센스 헤더를 로딩합니다.
+
+console-reports: # Detekt 실행 중 console stdout 되는 내용에 대한 설정.
+    active: true # 콘솔 리포트 전역 활성화 여부. default = true
+    exclude:
+        - 'ProjectStatisticsReport'     # 변수, 함수, 클래스, 패키지, kt 파일 개수에 대한 콘솔 리포트
+        - 'ComplexityReport'            # 코드 줄 수 등 복잡도에 대한 콘솔 리포트
+        - 'NotificationReport'          # 보고서 파일 생성 정보에 대한 콘솔 리포트
+        - 'FindingsReport'              # 발견 된 규칙 위반에 대한 콘솔 리포트
+        - 'FileBasedFindingsReport'     # 파일 위치 별 그룹화 된 콘솔 리포트
+        # - 'LiteFindingsReport'        # 리포트 형태를 lite 형태로 콘솔 출력
+
+output-reports: # Detekt 보고서 생성에 대한 설정
+    active: true # 보고서 생성 전역 활성화 여부. default = true
+    exclude:
+        - 'TxtOutputReport'
+        - 'XmlOutputReport'
+        - 'SarifOutputReport'
+        # - 'HtmlOutputReport'
+        # - 'MdOutputReport'
+
+comments: # Detekt의 주석에 대한 검사에 대한 옵션. https://detekt.dev/docs/rules/comments
+    active: true # 주석 관련 검사 전역 활성화 여부. default = true
+    AbsentOrWrongFileLicense: # 라이센스 파일 존재 및 형식 검사 여부 설정. default = false
+        active: false
+        licenseTemplateFile: 'license.template'
+        licenseTemplateIsRegex: false
+    CommentOverPrivateFunction: # private 함수에 대한 주석이 있는지 검사. default = false
+        active: false
+    CommentOverPrivateProperty: # private 프로퍼티에 대한 주석이 있는지 검사. default = false
+        active: false
+    DeprecatedBlockTag: # 주석에 사용되지 않는 블록 태그가 있는지 검사. default = false
+        active: false
+    EndOfSentenceFormat: # 주석 문장 끝 형식을 검사. default = false
+        active: false
+        endOfSentenceFormat: '([.?!][ \t\n\r\f<])|([.?!:]$)' # 문장 끝 형식에 대한 정규 표현식 선언
+    KDocReferencesNonPublicProperty: # Kdoc에서 public이 아닌 프로퍼티 참조 여부를 검사. default = false
+        active: false
+        # test 관련 폴더에 대해서 비활성화 처리
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    OutdatedDocumentation: # 문서화 한 내용이 코드 변경으로 만료되었는지 검사. default = false
+        active: false
+        matchTypeParameters: true                   # 문서화된 함수/클래스 매개변수 타입과 코드 일치 여부 검사. default = true
+        matchDeclarationsOrder: true                # 문서화된 함수/클래스 선언 순서와 코드 일치 여부 검사. default = true
+        allowParamOnConstructorProperties: false    # 클래스 생성자의 매개변수를 @property 대신 @param 선언 허용. default = false
+    UndocumentedPublicClass: # public class 에 대한 주석 누락 여부에 대해 검사. default = false
+        active: false
+        # test 관련 폴더에 대해서 비활성화 처리
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        searchInNestedClass: true           # nested class에 대한 검사 포함. default = true
+        searchInInnerClass: true            # inner class에 대한 검사 포함. default = true
+        searchInInnerObject: true           # inner object에 대한 검사 포함. default = true
+        searchInInnerInterface: true        # inner interface에 대한 검사 포함. default = true
+        searchInProtectedClass: false       # protected class에 대한 검사 포함. default = true
+    UndocumentedPublicFunction: # public function 에 대한 주석 누락 여부에 대해 검사. default = false
+        active: false
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        searchProtectedFunction: false      # protected function에 대한 검사 포함. default = false
+    UndocumentedPublicProperty: # public property 에 대한 주석 누락 여부에 대해 검사. default = false
+        active: false
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        searchProtectedProperty: false      # protected property에 대한 검사 포함. default = false
+
+complexity: # Detekt의 코드 복잡도 규칙 검사에 대한 옵션. https://detekt.dev/docs/rules/complexity
+    active: true    # 코드 복잡도 규칙 검사 전역 활성화 여부. default = true
+    CognitiveComplexMethod: # 함수의 인지적 복잡도 검사 옵션. if, when, for, while, 재귀 선언 등에 대해 계산됨.
+        active: false                   # default = false
+        threshold: 15                   # 복잡도 계산식 합 threshold. default = 15
+    ComplexCondition: # Boolean condition 개수 제한 검사 옵션.
+        active: true                    # default = true
+        threshold: 4                    # 최대 condition 검사 개수 threshold. default = 4
+    ComplexInterface: # Interface의 복잡도 검사 옵션.
+        active: false                       # default = false
+        threshold: 10                       # Interface에 허용되는 최대 선언 개수. default = 10
+        includeStaticDeclarations: false    # static 선언도 계산에 포함. default = false
+        includePrivateDeclarations: false   # private 선언도 계산에 포함. default = false
+        ignoreOverloaded: false             # overload 된 선언도 계산에 포함. default = false
+    CyclomaticComplexMethod: # 함수의 절차적 복잡도 대한 검사 옵션. condition, loop, 비교 연산 등 1개 함수에 너무 많은 기능에 대해 계산됨.
+        active: true                        # default = true
+        threshold: 15                       # 복잡도 합 threshold. default = 15
+        ignoreSingleWhenExpression: false   # 단일 when 절에 대한 무시 여부. default = false
+        ignoreSimpleWhenEntries: false      # 간단한 when 절에 대한 무시 여부. default = false
+        ignoreNestingFunctions: false       # 중첩 함수에 대한 계산 무시 여부. default = false
+        nestingFunctions: # 무시할 중첩 함수 목록 선언
+            - 'also'
+            - 'apply'
+            - 'forEach'
+            - 'isNotNull'
+            - 'ifNull'
+            - 'let'
+            - 'run'
+            - 'use'
+            - 'with'
+    LabeledExpression: # Label 표현식(this@Name)에 대한 검사 옵션.
+        active: false                   # default = false
+        ignoredLabels: [ ]              # 검사에서 제외할 Label 목록 선언
+    LargeClass: # Class SRP 준수를 위한 size 검사 옵션.
+        active: true                    # default = true
+        threshold: 600                  # 최대 class size. default = 600
+    LongMethod: # Method SRP 준수를 위한 size 검사 옵션.
+        active: true                    # default = true
+        threshold: 60                   # 최대 method size. default = 60
+    LongParameterList: # 최대 parameter 개수 제한 검사 옵션.
+        active: true                    # default = true
+        functionThreshold: 6            # 함수의 최대 parameter 개수. default = 6
+        constructorThreshold: 7         # 생성자의 최대 parameter 개수. default = 7
+        ignoreDefaultParameters: false  # default value가 있는 parameter 제외. default = false
+        ignoreDataClasses: true         # data class를 검사에서 제외. default = true
+        ignoreAnnotatedParameter: [ ]   # 검사에서 제외할 parameter annotation 목록.
+    MethodOverloading: # 함수 오버로딩 제한 검사 옵션.
+        active: false                   # default = false
+        threshold: 6                    # 최대 오버로딩 threshold. default = 6
+    NamedArguments: # 함수 호출 시 threshold 이상 argument 존재 시 name 선언 검사.
+        active: false                       # default = false
+        threshold: 3                        # argument name 선언이 필요한 함수 argument 개수. default = 3
+        ignoreArgumentsMatchingNames: false # argument name과 value가 같을 경우 무시. default = false
+    NestedBlockDepth: # nested block 선언 시 Indent 수 제한 검사.
+        active: true                    # default = true
+        threshold: 4                    # 최대 nested block threshold. default = 4
+    NestedScopeFunctions: # scoped function 사용 시 nesting 제한 검사.
+        active: false                   # default = false
+        threshold: 1                    # nesting 제한 개수. default = 1
+        functions:
+            - 'kotlin.apply'
+            - 'kotlin.run'
+            - 'kotlin.with'
+            - 'kotlin.let'
+            - 'kotlin.also'
+    ReplaceSafeCallChainWithRun: # Safe Call Chain(a?.b?.c) 대신 run(a?.run{ b.c }) 형태로 사용하도록 검사.
+        active: false                   # default = false
+    StringLiteralDuplication: # 동일한 string 값을 여러번 선언하는지 검사.
+        active: false                               # default = false
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        threshold: 3                                # 최대 동일 stringLiteral 허용 횟수. default = 3
+        ignoreAnnotation: true                      # Annotation에 사용되는 stringLiteral 제외. default = true
+        excludeStringsWithLessThan5Characters: true # 5글자 이하는 제외. default = true
+        ignoreStringsRegex: '$^'                    # 무시할 stringLiteral 정규식 패턴
+    TooManyFunctions: # class, interface, object, enum에 너무 많은 함수가 있는 경우 검사.
+        active: true                # default = true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        thresholdInFiles: 11        # 1개 파일에 최대 함수 개수. default = 11
+        thresholdInClasses: 11      # 1개 class에 최대 함수 개수. default = 11
+        thresholdInInterfaces: 11   # 1개 interface에 최대 함수 개수. default = 11
+        thresholdInObjects: 11      # 1개 object에 최대 함수 개수. default = 11
+        thresholdInEnums: 11        # 1개 enum에 최대 함수 개수. default = 11
+        ignoreDeprecated: false     # deprecated funtion 무시. default = false
+        ignorePrivate: false        # private funtion 무시. default = false
+        ignoreOverridden: false     # override 된 funtion 무시. default = false
+
+coroutines: # Detekt의 kotlin coroutine 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/coroutines
+    active: true            # coroutine 규칙 검사 전역 활성화 여부. default = true
+    GlobalCoroutineUsage: # GlobalScope 사용 검사.
+        active: false           # default = true
+    InjectDispatcher: # Dispatcher Injection 받아 사용하는지 검사.
+        active: true            # default = true
+        dispatcherNames: # 해당하는 Dispatcher 목록(main의 경우 주입 받지 않고, ui dispatcher 직사용 하는 경우 존재)
+            - 'IO'
+            - 'Default'
+            - 'Unconfined'
+    RedundantSuspendModifier: # suspend modifier 불필요한 경우 사용 검사. default = true
+        active: true
+    SleepInsteadOfDelay: # Thread.sleep 대신 delay 사용 검사. default = true
+        active: true
+    SuspendFunSwallowedCancellation: # runcatching 블록 안에서 suspend function 호출 검사. default = false
+        active: false
+    SuspendFunWithCoroutineScopeReceiver: # coroutine scope에 직접 suspend 확장 함수 선언 검사. default = false
+        active: false
+    SuspendFunWithFlowReturnType: # flow를 반환하는 함수를 suspend 함수로 만들지 않았는지 검사. default = true
+        active: true
+
+empty-blocks: # Detekt의 empty block 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/empty-blocks
+    active: true            # empty block 규칙 검사 전역 활성화 여부. default = true
+    EmptyCatchBlock: # try-catch의 catch 블록이 비어있는지 검사. default = true
+        active: true
+        allowedExceptionNameRegex: '_|(ignore|expected).*' # 허용되는 비어있는 catch 블록에 대한 정규식. 테스트에 사용되는 expected 등 제외.
+    EmptyClassBlock: # class 선언이 비어있는지 검사. default = true
+        active: true
+    EmptyDefaultConstructor: # constructor가 비어있는지 검사. default = true
+        active: true
+    EmptyDoWhileBlock: # do/while loop 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyElseBlock: # else block이 비어있는지 검사. default = true
+        active: true
+    EmptyFinallyBlock: # try-catch-finally의 finally 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyForBlock: # for loop 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyFunctionBlock: # 함수 블록이 비어있는지 검사. default = true
+        active: true
+        ignoreOverridden: false # override 된 함수가 비어있는 경우 무시 여부. default = false
+    EmptyIfBlock: # if 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyInitBlock: # init 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyKtFile: # kt file이 비어있는지 검사. default = true
+        active: true
+    EmptySecondaryConstructor: # 기본 생성자 외의 생성자 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyTryBlock: # try 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyWhenBlock: # when 블록이 비어있는지 검사. default = true
+        active: true
+    EmptyWhileBlock: # while loop 블록이 비어있는지 검사. default = true
+        active: true
+
+exceptions: # Detekt의 exception 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/exceptions
+    active: true        # exception 규칙 검사 전역 활성화 여부. default = true
+    ExceptionRaisedInUnexpectedLocation: # exception이 발생하면 안되는 함수에서 exception 발생 시키는지 검사. default = true
+        active: true
+        methodNames: # exception 발생 금지 함수 목록
+            - 'equals'
+            - 'finalize'
+            - 'hashCode'
+            - 'toString'
+    InstanceOfCheckForException: # exception 구분을 catch 블록 파라미터로 하는지 검사. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    NotImplementedDeclaration: # NotImplementedError 대신 [TODO] 사용하는지 검사. default = false
+        active: false
+    ObjectExtendsThrowable: # object가 Throwable()을 상속받지 않는지 검사. default = false
+        active: false
+    PrintStackTrace: # printStackTrace()를 직접 호출하고 있는지 검사. default = true
+        active: true
+    RethrowCaughtException: # catch에서 exception을 단순히 rethrow 하지 않는지 검사. default = true
+        active: true
+    ReturnFromFinally: # finally 블록에서 return이 사용되지 않는지 검사. default = true
+        active: true
+        ignoreLabeled: false    # labeled(return this@loop 등) return은 예외 처리. default = false
+    SwallowedException: # catch 한 exception을 미사용하지 않았는지 검사. default = true
+        active: true
+        ignoredExceptionTypes: # 무시할 exception type
+            - 'InterruptedException'
+            - 'MalformedURLException'
+            - 'NumberFormatException'
+            - 'ParseException'
+        allowedExceptionNameRegex: '_|(ignore|expected).*' # 사용되지 않아도 되는 exception 정규식.
+    ThrowingExceptionFromFinally: # finally 블록에서 exception 발생시키지 않는지 검사. default = true
+        active: true
+    ThrowingExceptionInMain: # main 함수에서 exception 발생시키지 않는지 검사. default = false
+        active: false
+    ThrowingExceptionsWithoutMessageOrCause: # message 없이 throw exception 하는 경우가 있는지 검사. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        # 해당 조건을 적용할 exception 목록
+        exceptions:
+            - 'ArrayIndexOutOfBoundsException'
+            - 'Exception'
+            - 'IllegalArgumentException'
+            - 'IllegalMonitorStateException'
+            - 'IllegalStateException'
+            - 'IndexOutOfBoundsException'
+            - 'NullPointerException'
+            - 'RuntimeException'
+            - 'Throwable'
+    ThrowingNewInstanceOfSameException: # 같은 exception을 재 wrapping해서 throw 하지 않는지 검사. default = true
+        active: true
+    TooGenericExceptionCaught: # catch 블록에서 너무 일반적인 exception을 catch 하지 않는지 검사. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        # 일반적인 exception 목록
+        exceptionNames:
+            - 'ArrayIndexOutOfBoundsException'
+            - 'Error'
+            - 'Exception'
+            - 'IllegalMonitorStateException'
+            - 'IndexOutOfBoundsException'
+            - 'NullPointerException'
+            - 'RuntimeException'
+            - 'Throwable'
+        allowedExceptionNameRegex: '_|(ignore|expected).*' # 무시할 exception 정규식
+    TooGenericExceptionThrown: # 너무 일반적인 exception을 throw 하지 않는지 검사. default = true
+        active: true
+        # 일반적인 exception 목록
+        exceptionNames:
+            - 'Error'
+            - 'Exception'
+            - 'RuntimeException'
+            - 'Throwable'
+
+naming: # Detekt의 naming 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/naming
+    active: true    # naming 규칙 검사 전역 활성화 여부. default = true
+    BooleanPropertyNaming: # boolean 타입 property 이름 규칙 정의. default = false
+        active: true
+        allowedPattern: '^(is|has|are)'                 # 허용되는 naming pattern 정규식
+    ClassNaming: # class naming 규칙 정의. default = true
+        active: true
+        classPattern: '[A-Z][a-zA-Z0-9]*'               # 허용되는 class naming pattern 정규식
+    ConstructorParameterNaming: # constructor parameter naming 규칙 정의. default = true
+        active: true
+        parameterPattern: '[a-z][A-Za-z0-9]*'           # 허용되는 parameter naming pattern 정규식
+        privateParameterPattern: '[a-z][A-Za-z0-9]*'    # 허용되는 private parameter naming pattern 정규식
+        excludeClassPattern: '$^'                       # 예외 처리 할 class naming pattern 정규식
+    EnumNaming: # enum class entry naming pattern 규칙 정의. default = true
+        active: true
+        enumEntryPattern: '[A-Z][_a-zA-Z0-9]*'          # 허용되는 enum entry naming pattern 정규식
+    ForbiddenClassName: # 금지할 class 이름 정의. default = false
+        active: false
+        forbiddenName: [ ]                              # 금지할 class 이름 목록.
+    FunctionMaxLength: # 최대 function name 길이 정의. default = false
+        active: false
+        maximumFunctionNameLength: 30                   # function name 최대 길이. default = 30
+    FunctionMinLength: # 최소 function name 길이 정의. default = false
+        active: false
+        minimumFunctionNameLength: 3                    # function name 최소 길이. default = 3
+    FunctionNaming: # function naming 규칙 정의. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        functionPattern: '[a-z][a-zA-Z0-9]*'            # 허용되는 function naming pattern 정규식
+        excludeClassPattern: '$^'                       # 예외 처리 할 class naming pattern 정규식
+        ignoreAnnotated: [ 'Composable' ]                 # 예외 처리 할 function annotation(e.g. Composable)
+    FunctionParameterNaming: # function parameter naming 규칙 정의. default = true
+        active: true
+        parameterPattern: '[a-z][A-Za-z0-9]*'           # 허용되는 function naming pattern 정규식
+        excludeClassPattern: '$^'                       # 예외 처리 할 class naming pattern 정규식
+    InvalidPackageDeclaration: # package와 실제 file location이 매칭되는지 검사. default = true
+        active: true
+        rootPackage: ''                                 # rootPackage 정의. default = ''
+        requireRootInDeclaration: false                 # 정의된 rootPackage가 선언에 포함되는지 검사. default = false
+    LambdaParameterNaming: # lambda의 parameter naming 규칙 정의. default = false
+        active: false
+        parameterPattern: '[a-z][A-Za-z0-9]*|_'         # 허용되는 lambda parameter naming pattern 정규식
+    MatchingDeclarationName: # 단일 클래스만 있는 파일의 경우 naming을 클래스와 동일하게 하였는지 검사. default = true
+        active: true
+        mustBeFirst: true                               # 파일 naming의 시작부에 class name이 포함되는지 검사. default = true
+    MemberNameEqualsClassName: # class member name이 class name과 동일한 경우가 있는지 검사. default = ture
+        active: true
+        ignoreOverridden: true                          # override 된 member 무시. default = true
+    NoNameShadowing: # 동일한 이름의 variable이 있는지 검사. default = true
+        active: true
+    NonBooleanPropertyPrefixedWithIs: # boolean이 아닌 property가 'is'를 포함하는지 검사. default = true
+        active: false
+    ObjectPropertyNaming: # object property naming 검사. default = true
+        active: true
+        constantPattern: '[A-Za-z][_A-Za-z0-9]*'            # 허용되는 object member constant naming pattern 정규식
+        propertyPattern: '[A-Za-z][_A-Za-z0-9]*'            # 허용되는 object property naming pattern 정규식
+        privatePropertyPattern: '(_)?[A-Za-z][_A-Za-z0-9]*' # 허용되는 object private property naming pattern 정규식
+    PackageNaming: # package naming 검사. default = true
+        active: true
+        packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'      # 허용되는 package naming pattern 정규식
+    TopLevelPropertyNaming: # top-level property naming 검사. default = true
+        active: true
+        constantPattern: '[A-Z][_A-Z0-9]*'                  # 허용되는 top-level constant naming pattern 정규식
+        propertyPattern: '[A-Za-z][_A-Za-z0-9]*'            # 허용되는 top-level property naming pattern 정규식
+        privatePropertyPattern: '_?[A-Za-z][_A-Za-z0-9]*'   # 허용되는 top-level private property naming pattern 정규식
+    VariableMaxLength: # variable name max length 제한 검사. default = false
+        active: false
+        maximumVariableNameLength: 64                       # 최대 variable name 길이. default = 64
+    VariableMinLength: # variable name min length 제한 검사. default = false
+        active: false
+        minimumVariableNameLength: 1                        # 최대 variable name 길이. default = 1
+    VariableNaming: # variable naming 검사. default = true
+        active: true
+        variablePattern: '[a-z][A-Za-z0-9]*'                # 허용되는 variable naming pattern 정규식
+        privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'     # 허용되는 private variable naming pattern 정규식
+        excludeClassPattern: '$^'                           # 예외 처리 할 class naming pattern 정규식
+
+performance: # Detekt의 performance 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/performance
+    active: true    # performance 규칙 검사 전역 활성화 여부. default = true
+    ArrayPrimitive: # primitive type의 array의 경우 kotlin 정의된 array 사용(e.g. IntArray, DoubleArray..) default = true
+        active: true
+    CouldBeSequence: # 긴 chaining operation에 collection 대신 sequence 사용. default = false
+        active: false
+        threshold: 3        # chaining operation threshold. default = 3
+    ForEachOnRange: # range foreach 대신 for 문 사용. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    SpreadOperator: # '*' 사용해서 vararg parameter에 array copy 방지 옵션. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    UnnecessaryPartOfBinaryExpression: # 불필요한 이진 연산(e.g. true || true) 검사. default = false
+        active: false
+    UnnecessaryTemporaryInstantiation: # toString() 호출을 위한 불필요한 primitive type 선언 검사.(e.g. Integer(1).toString()). default = true
+        active: true
+
+potential-bugs: # Detekt의 잠재적 버그 발생 요인 관련 검사에 대한 옵션. https://detekt.dev/docs/rules/potential-bugs
+    active: true    # potential-bugs 규칙 검사 전역 활성화 여부. default = true
+    AvoidReferentialEquality: # 객체 참조 동등성(kotlin : ===) 대신 equals(kotlin : ==) 사용하는지 검사. default = true
+        active: true
+        forbiddenTypePatterns: # 무시할 type 정규식 pattern
+            - 'kotlin.String'
+    CastNullableToNonNullableType: # null 값을 not null 타입으로 캐스팅하는 코드 검사. default = false
+        active: false
+    CastToNullableType: # nullable type으로의 unsafe cast 하는 코드가 있는지 검사. default = false
+        active: false
+    Deprecation: # deprecated elements를 사용하고 있는지 검사. default = false
+        active: false
+    DontDowncastCollectionTypes: # immutable collection type을 mutable collection type으로 캐스팅하는지 검사. default = false
+        active: false
+    DoubleMutabilityForCollection: # mutable collection을 variable로 선언하는지 검사. default = true
+        active: true
+        mutableTypes:
+            - 'kotlin.collections.MutableList'
+            - 'kotlin.collections.MutableMap'
+            - 'kotlin.collections.MutableSet'
+            - 'java.util.ArrayList'
+            - 'java.util.LinkedHashSet'
+            - 'java.util.HashSet'
+            - 'java.util.LinkedHashMap'
+            - 'java.util.HashMap'
+    ElseCaseInsteadOfExhaustiveWhen: # enum class, sealed class 등에서 else 대신 실제 사용되는 타입으로 when 문 작성. default = false
+        active: false
+        ignoredSubjectTypes: [ ]
+    EqualsAlwaysReturnsTrueOrFalse: # equals() 함수가 항상 true/false 중 정해진 값을 반환하는지 검사. default = true
+        active: true
+    EqualsWithHashCodeExist: # equals()가 hashcode()와 함께 override 되는지 검사. default = true
+        active: true
+    ExitOutsideMain: # 프로그램 종료 코드는 main() 함수에서만 허용. default = false
+        active: false
+    ExplicitGarbageCollectionCall: # 명시적인 GC 작업 call 금지. default = true
+        active: true
+    HasPlatformType: # 플랫폼 의존적인 코드(jvm, js, kotlin-native 등)는 반환 타입을 명시해야함. default = true
+        active: true
+    IgnoredReturnValue: # 함수의 return value가 사용되지 않는 경우를 검사. default =true
+        active: true
+        restrictToConfig: true # 설정 파일에서 지정된 주석, 반환 값은 무시 가능하도록 설정. default = true
+        returnValueAnnotations: # 무시할 반환값 자료형의 annotation 등록
+            - 'CheckResult'
+            - '*.CheckResult'
+            - 'CheckReturnValue'
+            - '*.CheckReturnValue'
+        ignoreReturnValueAnnotations: # 무시할 메소드 annotation 등록
+            - 'CanIgnoreReturnValue'
+            - '*.CanIgnoreReturnValue'
+        returnValueTypes: # 무시할 반환값 자료형 등록
+            - 'kotlin.sequences.Sequence'
+            - 'kotlinx.coroutines.flow.*Flow'
+            - 'java.util.stream.*Stream'
+        ignoreFunctionCall: [ ] # 무시할 함수 등록
+    ImplicitDefaultLocale: # Locale을 암시적으로 등록하는 경우 성능에 영향을 줌. 명시적 선언 검사. default = true
+        active: true
+    ImplicitUnitReturnType: # 표현식으로 return type을 암시적 선언하는 경우 이후 버전에 영향을 줄 수 있음. default = false
+        active: false
+        allowExplicitReturnType: true # 명시적 Unit 반환형 허용. default = true
+    InvalidRange: # Range 표현이 이상한 경우 검사(e.g. 2..1, 1 downTo 2). default = true
+        active: true
+    IteratorHasNextCallsNextMethod: # Iterator.hasNext() override 시 내부에서 next() 호출 금지. default = true
+        active: true
+    IteratorNotThrowingNoSuchElementException: # Iterator의 끝에 도달했을 때 NoSuchElementException 반환 필수. default = true
+        active: true
+    LateinitUsage: # lateinit 초기화 안되는 경우로 사용 지양하도록 검사. default = false
+        active: false
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+        ignoreAnnotated: [ 'Inject' ]   # 예외 처리할 annotation 등록
+        ignoreOnClassesPattern: ''      # 예외 처리할 class pattern 등록
+    MapGetWithNotNullAssertionOperator: # map.get() 사용 시 non-null assert(!!) 금지. default = true
+        active: true
+    MissingPackageDeclaration: # 패키지 선언 누락 검사. default = false
+        active: false
+        excludes: [ '**/*.kts' ]
+    NullCheckOnMutableProperty: # if문 null 체크 이후 변수에 non-null assert(!!) 사용 금지. default = false
+        active: false
+    NullableToStringCall: # toString() 함수에서 null 일 경우 "null" 반환 금지. default = false
+        active: false
+    PropertyUsedBeforeDeclaration: # property가 선언 이전에 사용되는 경우 방지. default = false
+        active: false
+    UnconditionalJumpStatementInLoop: # loop에서 조건 없는 break 사용 금지. default = false
+        active: false
+    UnnecessaryNotNullCheck: # 불필요한 null check 금지. default = false
+        active: false
+    UnnecessaryNotNullOperator: # 불필요한 non-null assert(!!) 금지. default = true
+        active: true
+    UnnecessarySafeCall: # 불필요한 safe call(?.) 금지. default = true
+        active: true
+    UnreachableCatchBlock: # 도달 불가능한 catch 블록 금지. default = true
+        active: true
+    UnreachableCode: # 도달 불가능한 코드 금지 default = true
+        active: true
+    UnsafeCallOnNullableType: # nullable 타입에 non-null assert(!!) 금지. default = true
+        active: true
+        # 테스트 코드 제외
+        excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    UnsafeCast: # 성공할 수 없는 type casting 금지. default = true
+        active: true
+    UnusedUnaryOperator: # 미 사용된 단항 형상자 검사. default = true
+        active: true
+    UselessPostfixExpression: # 사용되지 않는 후위 연산자 검사. default = true
+        active: true
+    WrongEqualsTypeParameter: # 잘못된 타입 매개변수 사용한 equals() 검사. default = true
+        active: true
+
+style: # style은 ktlint 대체
+    active: false
