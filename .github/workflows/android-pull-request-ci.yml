@@ -33,7 +33,7 @@ jobs:
           sdk_key_dev: ${{ secrets.SDK_KEY_DEV }}
           sdk_key_stg: ${{ secrets.SDK_KEY_STG }}
           sdk_key_prod: ${{ secrets.SDK_KEY_PROD }}
-        run:
+        run: |
           echo api_url_dev=\"$api_url_dev\" >> ./secret.properties
           echo api_url_stg=\"$api_url_stg\" >> ./secret.properties
           echo api_url_prod=\"$api_url_prod\" >> ./secret.properties
