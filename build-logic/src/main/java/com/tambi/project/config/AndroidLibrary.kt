@@ -12,10 +12,12 @@ internal fun Project.configureAndroidLibrary() {
     pluginManager.apply("com.android.library")
 
     extensions.configure<LibraryExtension> {
-        val uniqueNameSpace = projectDir.name.replace('-', '_')
-        namespace = "${ProjectConfig.namespace}.${uniqueNameSpace}"
+        val uniqueNamespace = project.displayName.substring("project ".length)
+            .replace("'", "")
+            .replace('-', '_')
+            .replace(':', '.')
 
-        println(namespace.toString())
+        namespace = "${ProjectConfig.namespace}${uniqueNamespace}"
     }
 
     configureKotlinAndroid()
