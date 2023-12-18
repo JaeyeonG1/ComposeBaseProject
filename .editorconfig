@@ -1,0 +1,27 @@
+# ktlint : https://pinterest.github.io/ktlint/1.0.1/
+# EditorConfig : https://EditorConfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 120
+tab_width = 4
+# Package name rule 비활성화 (Underscore 등 convention 위반 코드 이미 포함됨. ex. design_system 등)
+ktlint_standard_package-name = disabled
+
+[*.{kt,kts}]
+# Composable Function 함수 네이밍 검사 제외 - Compose 관련은 해당 룰 적용됨(https://mrmans0n.github.io/compose-rules/rules/)
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+# ktlint_standard 속성
+ktlint_standard = enabled
+# 1줄 이상의 표현식 줄바꿈 필수
+ktlint_standard_string-template-indent = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+# Trailing comma 필수 설정
+ktlint_standard_trailing-comma-on-call-site = enabled

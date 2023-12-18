@@ -1,0 +1,45 @@
+#!/bin/bash
+
+echo "==================================="
+echo "=   Running git pre-commit hook   ="
+echo "==================================="
+
+# Find git staged files
+staged_files=$'git --no-pager diff --name-status --no-color --cached'
+# Filter kotlin files from staged files
+staged_kotlin_files=$(${staged_files} | awk '$1 != "D" && $NF ~ /\.kts?$/ { print $NF }')
+
+# Exit if kotlin files not found
+if [ -z "$staged_kotlin_files" ]; then
+    echo "=> Staged Kotlin files not found."
+    exit 0
+fi
+
+echo "==================================="
+echo "= Running ktlint over these files ="
+echo "==================================="
+echo "$staged_kotlin_files"
+echo "==================================="
+
+# Run ktlint only with staged kotlin files
+# ktlint filter option const value
+FILTER_INCLUDE_PROPERTY_NAME="internalKtlintGitFilter"
+
+# Use gradle --daemon and --parallel options to improve performance
+# --continue option for continue check every modules after build failed
+# --warn option for disable showing gradle task on terminal log
+./gradlew ktlintCheck --daemon --parallel --continue --warn -P"$FILTER_INCLUDE_PROPERTY_NAME"="$staged_kotlin_files"
+
+kt_lint_check_result=$?
+
+if [ "$kt_lint_check_result" = 0 ]; then
+    echo "==================================="
+    echo "=   Completed pre-commit hook!!   ="
+    echo "==================================="
+    exit 0
+else
+    echo "==================================="
+    echo "=  Failed from pre-commit hook!!  ="
+    echo "==================================="
+    exit 1
+fi
