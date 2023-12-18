@@ -6,7 +6,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyApp">
+            android:theme="@style/Theme.ComposeProject">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

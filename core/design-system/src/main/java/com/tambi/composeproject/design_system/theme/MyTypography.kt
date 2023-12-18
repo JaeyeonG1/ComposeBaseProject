@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
-import com.tambi.composeproject.design_system.R
+import com.tambi.composeproject.core.design_system.R
 
 object MyTypography {
     // Font Variation

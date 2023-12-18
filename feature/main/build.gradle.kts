@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.convention.android.compose)
 }
 
-
 dependencies {
     implementation(projects.core.designSystem)
     implementation(projects.core.navigation)
