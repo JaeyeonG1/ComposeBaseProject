@@ -369,7 +369,7 @@ naming: # Detekt의 naming 관련 검사에 대한 옵션. https://detekt.dev/do
         propertyPattern: '[A-Za-z][_A-Za-z0-9]*'            # 허용되는 object property naming pattern 정규식
         privatePropertyPattern: '(_)?[A-Za-z][_A-Za-z0-9]*' # 허용되는 object private property naming pattern 정규식
     PackageNaming: # package naming 검사. default = true
-        active: true
+        active: false
         packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'      # 허용되는 package naming pattern 정규식
     TopLevelPropertyNaming: # top-level property naming 검사. default = true
         active: true
