@@ -1,30 +1,50 @@
-name: Android CI
+# Github 상 표현 되는 workflow name
+name: Android Pull Request
 
-on: [pull_request]
+# 해당 workflow 실행 조건
+# master, release/{version}, develop 타겟 PR일 경우 실행
+on:
+  pull_request:
+    branches:
+      - master
+      - release/**
+      - develop
 
-env:
-  api_url_dev: ${{ secrets.API_URL_DEV }}
-  api_url_stg: ${{ secrets.API_URL_STG }}
-  api_url_prod: ${{ secrets.API_URL_PROD }}
-  sdk_key_dev: ${{ secrets.SDK_KEY_DEV }}
-  sdk_key_stg: ${{ secrets.SDK_KEY_STG }}
-  sdk_key_prod: ${{ secrets.SDK_KEY_PROD }}
+# 이미 해당 action 실행 중인 경우 취소 후 재실행
+# Github Action 자원 낭비 및 최신 버전 기준 결과값 표출을 위해 추가
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+# 실행할 workflow job 선언
 jobs:
   run-detekt:
     name: Check with Detekt
     runs-on: ubuntu-latest
-    
+
     steps:
+      # PR 요청한 브랜치 checkout
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      # gradle/wrapper/gradle-wrapper.jar 파일 체크섬 확인
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Copy CI gradle.properties
-        run: mkdir -p ~/.gradle ; cp .github/ci.gradle.properties ~/.gradle/gradle.properties
-  
+      # 실행 os나 gradle 설정 관련 파일 변경이 없는 경우 gradle sync 스킵
+      # 또한, task 실행 시 캐시 데이터 존재할 시 "FROM-CACHE" 동작 빌드
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+              ~/.gradle/caches
+              ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+              ${{ runner.os }}-gradle-
+
+      # JDK 17 버전 다운로드 및 설치
+      # gradle cache 이용해 캐시 존재할 경우 다운로드 과정 스킵
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -32,47 +52,24 @@ jobs:
           distribution: 'zulu'
           cache: gradle
 
+      # gradlew 명령어 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        
+
+      # Detekt 정적 분석 실행
+      # parallel : 멀티 모듈 병렬 빌드 지원
+      # continue : 특정 모듈 Failed 결과로 마무리 되어도 나머지 모듈 전체 실행
       - name: Run detekt
-        run: ./gradlew detekt --parallel --daemon --continue 
-          
-  build:
-    name: Build App
-    runs-on: ubuntu-latest
+        run: ./gradlew detekt --parallel --continue
 
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
+      # UnitTest 실행
+      - name: Run UnitTest
+        run: ./gradlew testDevDebugUnitTest
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-        
-      - name: Copy CI gradle.properties
-        run: mkdir -p ~/.gradle ; cp .github/ci.gradle.properties ~/.gradle/gradle.properties
-        
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - name: Notify Google Chat
+        uses: Co-qn/google-chat-notification@releases/v1
         with:
-          java-version: '17'
-          distribution: 'zulu'
-          cache: gradle
-
-      - name: set up Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Apply secrets to properties
-        run: |
-          echo api_url_dev=\"$api_url_dev\" >> ./secret.properties
-          echo api_url_stg=\"$api_url_stg\" >> ./secret.properties
-          echo api_url_prod=\"$api_url_prod\" >> ./secret.properties
-          echo sdk_key_dev=\"$sdk_key_dev\" >> ./secret.properties
-          echo sdk_key_stg=\"$sdk_key_stg\" >> ./secret.properties
-          echo sdk_key_prod=\"$sdk_key_prod\" >> ./secret.properties
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-        
-      - name: Build with Gradle
-        run: ./gradlew build --parallel --daemon --continue
+          name: Pull Request Action
+          url: ${{ secrets.GOOGLE_CHAT_WEB_HOOK }}
+          status: ${{ job.status }}
+        if: always()
