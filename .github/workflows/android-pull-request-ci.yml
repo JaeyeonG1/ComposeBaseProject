@@ -1,6 +1,6 @@
 name: Android CI
 
-on: [push, pull_request]
+on: [pull_request]
 
 env:
   api_url_dev: ${{ secrets.API_URL_DEV }}
