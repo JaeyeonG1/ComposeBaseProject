@@ -69,7 +69,7 @@ jobs:
       - name: Notify Google Chat
         uses: Co-qn/google-chat-notification@releases/v1
         with:
-          name: Pull Request Action
+          name: ${{ github.event.pull_request.title }}
           url: ${{ secrets.GOOGLE_CHAT_WEB_HOOK }}
           status: ${{ job.status }}
         if: always()
